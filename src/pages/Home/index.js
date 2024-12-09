@@ -13,8 +13,22 @@ import Modal from "../../containers/Modal";
 import { useData } from "../../contexts/DataContext";
 
 const Page = () => {
-  const {last} = useData()
-  return <>
+  const {data} = useData()
+
+  // If the events array is empty or data/data.events is unavailable, the reduce method is not executed, and last is assigned null.
+  const last =
+  data && data.events && data.events.length > 0
+    ? data.events.reduce((latest, current) => {
+        // Use the date to compare and find the most recent
+        const latestDate = new Date(latest.date);
+        const currentDate = new Date(current.date);
+
+        return currentDate > latestDate ? current : latest;
+      })
+    : null;
+
+  return (
+    <>
     <header>
       <Menu />
     </header>
@@ -22,7 +36,7 @@ const Page = () => {
       <section className="SliderContainer">
         <Slider />
       </section>
-      <section className="ServicesContainer">
+      <section className="ServicesContainer" id="nos-services">
         <h2 className="Title">Nos services</h2>
         <p>Nous organisons des événements sur mesure partout dans le monde</p>
         <div className="ListContainer">
@@ -51,11 +65,11 @@ const Page = () => {
           </ServiceCard>
         </div>
       </section>
-      <section className="EventsContainer">
+      <section className="EventsContainer" id="nos-realisations">
         <h2 className="Title">Nos réalisations</h2>
         <EventList />
       </section>
-      <section className="PeoplesContainer">
+      <section className="PeoplesContainer" id="notre-equipe">
         <h2 className="Title">Notre équipe</h2>
         <p>Une équipe d’experts dédiés à l’ogranisation de vos événements</p>
         <div className="ListContainer">
@@ -115,14 +129,17 @@ const Page = () => {
     </main>
     <footer className="row">
       <div className="col presta">
-        <h3>Notre derniére prestation</h3>
-        <EventCard
-          imageSrc={last?.cover}
-          title={last?.title}
-          date={new Date(last?.date)}
-          small
-          label="boom"
-        />
+        <h3>Notre dernière prestation</h3>
+        {last && (
+          <EventCard /* Add last to make sure it exist first and then add attribut imageAlt and change label value to type */
+            imageSrc={last?.cover}
+            imageAlt={last?.description} 
+            title={last?.title}
+            date={new Date(last?.date)}
+            small
+            label={last?.type}
+          />
+        )}
       </div>
       <div className="col contact">
         <h3>Contactez-nous</h3>
@@ -155,6 +172,7 @@ const Page = () => {
       </div>
     </footer>
   </>
+  ) 
 }
 
 export default Page;
