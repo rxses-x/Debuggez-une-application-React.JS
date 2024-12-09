@@ -7,24 +7,32 @@ import "./style.scss";
 const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
+
+  // const byDateDesc = data?.focus.sort((evtA, evtB) =>
+  //   new Date(evtA.date) < new Date(evtB.date) ? -1 : 0
+  // );
+
+  // Sort in descending order
   const byDateDesc = data?.focus.sort((evtA, evtB) =>
-    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
+    new Date(evtB.date) - new Date(evtA.date)
   );
+
   const nextCard = () => {
-    setTimeout(
-      () => setIndex(index < byDateDesc.length ? index + 1 : 0),
-      5000
-    );
+    setIndex((prevIndex) => (prevIndex + 1) % byDateDesc.length);
   };
+
+  // Clear useEffet
+
   useEffect(() => {
-    nextCard();
-  });
+    const interval = setInterval(nextCard, 5000);
+    return () => clearInterval(interval);
+  }, [index, byDateDesc]);
+
   return (
     <div className="SlideCardList">
       {byDateDesc?.map((event, idx) => (
-        <>
+        <div key={event.title}>
           <div
-            key={event.title}
             className={`SlideCard SlideCard--${
               index === idx ? "display" : "hide"
             }`}
@@ -42,15 +50,16 @@ const Slider = () => {
             <div className="SlideCard__pagination">
               {byDateDesc.map((_, radioIdx) => (
                 <input
-                  key={`${event.id}`}
+                  key={event.id ? event.id : `radio-${radioIdx}`} /* If event.id is unavailable or non-unique, combine radio- with the index as a last resort. */
                   type="radio"
                   name="radio-button"
-                  checked={idx === radioIdx}
+                  readOnly
+                  checked={index === radioIdx} /* Use index instead of idx */
                 />
               ))}
             </div>
           </div>
-        </>
+        </div>
       ))}
     </div>
   );
