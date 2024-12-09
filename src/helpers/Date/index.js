@@ -13,4 +13,10 @@ export const MONTHS = {
   12: "décembre",
 };
 
-export const getMonth = (date) => MONTHS[date.getMonth()];
+// Add +1 to date since it was undefined because the indices don’t align.
+
+export const getMonth = (date) => MONTHS[date.getMonth() + 1];
+
+// improvement maybe? 
+// export const getMonth = (date) => 
+//   date.toLocaleString('fr-FR', { month: 'long' });
